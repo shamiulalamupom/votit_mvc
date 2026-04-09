@@ -73,5 +73,25 @@ class PollRepository
         return $poll;
     }
 
+    public function findByCategoryId(int $categoryId): array
+    {
+        $stmt = Mysql::getInstance()->getPdo()->prepare('SELECT * FROM poll WHERE category_id = ? ORDER BY id DESC');
+        $stmt->execute([$categoryId]);
+        $polls = [];
+        $catRepo = new CategoryRepository();
+        $category = $catRepo->findById($categoryId);
+        while ($data = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $polls[] = new Poll(
+                $data['id'],
+                $data['title'],
+                $data['description'],
+                $data['user_id'],
+                $data['category_id'],
+                $category
+            );
+        }
+        return $polls;
+    }
+
 
 }

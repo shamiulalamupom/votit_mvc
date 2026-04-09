@@ -3,6 +3,7 @@
         '/' => 'Accueil',
         '/about' => 'About',
         '/poll/list' => 'Listes des sondages',
+        '/category/list' => 'Catégories',
         '/poll/create' => 'Créer un sondage',
     ];
 ?>

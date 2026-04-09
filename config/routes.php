@@ -7,6 +7,8 @@ return [
     "/poll/" => ["controller" => "App\\Controller\\PollController", "action" => "show"],
     "/poll/list/" => ["controller" => "App\\Controller\\PollController", "action" => "list"],
     "/poll/vote/" => ["controller" => "App\\Controller\\PollController", "action" => "vote"],
+    "/category/list/" => ["controller" => "App\\Controller\\CategoryController", "action" => "list"],
+    "/category/" => ["controller" => "App\\Controller\\CategoryController", "action" => "show"],
     "/login/" => ["controller" => "App\\Controller\\AuthController", "action" => "login"],
     "/login/post/" => ["controller" => "App\\Controller\\AuthController", "action" => "loginPost"],
     "/logout/" => ["controller" => "App\\Controller\\AuthController", "action" => "logout"],
