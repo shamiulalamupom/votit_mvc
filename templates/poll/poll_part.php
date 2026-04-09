@@ -1,3 +1,4 @@
+<?php /** @var \App\Entity\Poll $poll */ ?>
 <div class="col-md-4 my-2 d-flex">
     <div class="card w-100">
         <div class="card-header">

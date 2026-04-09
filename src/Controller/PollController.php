@@ -10,8 +10,8 @@ use App\Entity\UserPollItem;
 
 class PollController extends Controller {
     public function list() {
-        // TODO : récupérer tous les sondages
-        $polls = [];
+        $pollRepository = new PollRepository();
+        $polls = $pollRepository->findAll();
         $this->render('poll/list', ['polls' => $polls]);
     }
     public function show() {
@@ -29,18 +29,64 @@ class PollController extends Controller {
         $this->render('poll/show', ['poll' => $poll, 'items' => $items, 'results' => $results]);
     }
     public function create() {
-        $this->render('poll/create');
         if (empty($_SESSION['user'])) {
-            header('Location: /login');
+            header('Location: /login/');
             exit;
         }
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // TODO : enregistrer le sondage et ses items
 
+        $this->render('poll/create');
+    }
+
+    public function createPost() {
+        if (empty($_SESSION['user'])) {
+            header('Location: /login/');
+            exit;
         }
+
+        $title = trim($_POST['title'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+        $categoryId = (int)($_POST['category_id'] ?? 0);
+        $optionsRaw = trim($_POST['options'] ?? '');
+
+        if ($title && $description && $categoryId && $optionsRaw) {
+            $userId = (int)$_SESSION['user']->getId();
+
+            $poll = new Poll(null, $title, $description, $userId, $categoryId);
+            $pollRepo = new PollRepository();
+            $poll = $pollRepo->create($poll);
+
+            $lines = array_filter(array_map('trim', explode("\n", $optionsRaw)));
+            $itemRepo = new PollItemRepository();
+            foreach ($lines as $line) {
+                $item = new PollItem(null, $line, $poll->getId());
+                $itemRepo->create($item);
+            }
+
+            header('Location: /poll/?id=' . $poll->getId());
+            exit;
+        }
+
+        header('Location: /poll/create/');
+        exit;
     }
   
     public function vote() {
-       // TODO : enregistrer le vote de l'utilisateur
+        if (empty($_SESSION['user'])) {
+            header('Location: /login/');
+            exit;
+        }
+
+        $pollId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+        $pollItemId = isset($_POST['option']) ? (int)$_POST['option'] : 0;
+
+        if ($pollId && $pollItemId) {
+            $userId = (int)$_SESSION['user']->getId();
+            $voteRepo = new UserPollItemRepository();
+            $voteRepo->removeVotesForUserAndPoll($userId, $pollId);
+            $voteRepo->addVote(new UserPollItem($userId, $pollItemId));
+        }
+
+        header('Location: /poll/?id=' . $pollId);
+        exit;
     }
 }
