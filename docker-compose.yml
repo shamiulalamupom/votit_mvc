@@ -1,0 +1,60 @@
+services:
+  app:
+    build: .
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_NAME: studi_votit
+      DB_USER: root
+      DB_PASSWORD: pass
+      DB_PORT: '3306'
+    ports:
+      - '8080:80'
+    volumes:
+      - .:/var/www/html
+    networks:
+      - default
+
+  db:
+    platform: linux/x86_64
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: studi_votit
+      MYSQL_ROOT_PASSWORD: pass
+    ports:
+      - '3308:3306'
+    command: --sql-mode=''
+    volumes:
+      - db:/var/lib/mysql
+      - ./studi_votit.sql:/docker-entrypoint-initdb.d/seed.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - default
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: pass
+    ports:
+      - '8081:80'
+    networks:
+      - default
+
+volumes:
+  db:
+
+networks:
+  default:
+    driver: bridge

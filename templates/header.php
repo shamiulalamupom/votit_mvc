@@ -1,6 +1,7 @@
 <?php
     $mainMenu = [
         '/' => 'Accueil',
+        '/about' => 'About',
         '/poll/list' => 'Listes des sondages',
         '/poll/create' => 'Créer un sondage',
     ];
